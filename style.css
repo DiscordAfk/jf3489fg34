@@ -66,3 +66,18 @@ dialog { max-width: min(90vw, 30rem); border: 1px solid var(--line); border-radi
 dialog::backdrop { background: #1c1c3480; }
 dialog h2 { margin: 0; }
 @media (max-width: 34rem) { .tiles { grid-template-columns: 1fr; } }
+.exercise-group { margin-block: 1rem; }
+.exercise-choice {
+  display: flex;
+  align-items: baseline;
+  gap: .65rem;
+  padding: .6rem .8rem;
+  border: 1px solid var(--line);
+  border-radius: .55rem;
+  background: white;
+  margin-bottom: .4rem;
+  cursor: pointer;
+}
+.exercise-choice input { accent-color: var(--purple); flex: none; }
+.exercise-choice small { display: block; color: var(--muted); font-size: .875rem; }
+#practice > .question > .secondary { margin-left: .65rem; }
