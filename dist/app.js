@@ -1,5 +1,5 @@
 const $ = id => document.getElementById(id);
-const tokenPattern = /[A-Za-z]+(?:[’'-][A-Za-z]+)*/g;
+const tokenPattern = /\p{Script=Latin}+(?:[’'-]\p{Script=Latin}+)*/gu;
 const dialog = $('translation');
 let session;
 const historyKey = 'tense-trainer-attempted';
@@ -71,7 +71,7 @@ for (const topic of topics) {
   input.type = 'checkbox';
   input.value = topic.id;
   const title = element('strong', '', topic.title);
-  title.lang = 'en';
+  title.lang = topic.lang ?? 'en';
   const copy = element('span');
   copy.append(title, element('small', '', topic.subtitle));
   tile.append(input, copy);
@@ -117,7 +117,7 @@ function renderTheory(selected) {
 
 function renderPicker(selected) {
   const picker = $('exercise-picker');
-  picker.replaceChildren(element('p', 'hint', 'Выбери упражнение по номеру из PDF, чтобы пройти все его пункты по порядку.'));
+  picker.replaceChildren(element('p', 'hint', 'Выбери упражнение, чтобы пройти все его пункты по порядку.'));
   for (const topic of selected) {
     const group = element('fieldset', 'exercise-group');
     group.append(element('legend', '', topic.title));
@@ -238,7 +238,7 @@ function renderQuestion(focus = false) {
       // Keep attempts in memory for this visit.
     }
     feedback.append(element('p', '', correct ? 'Верно.' : 'Посмотри разбор ответа.'));
-    footer.prepend(element('p', 'source', `${topic.source} · Practice ${reference}`));
+    footer.prepend(element('p', 'source', `${topic.source} · № ${reference}`));
     next.disabled = false;
   }
 

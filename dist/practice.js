@@ -10,7 +10,7 @@ function gapRows(text) {
 }
 
 function choices(topic, text) {
-  const original = exercises[topic];
+  const original = exercises[topic] ?? [];
   if (!text) return original.map(([prompt, ru, reference, options]) => ({prompt, ru, reference, options}));
   return text.trim().split('\n').map(line => {
     const [reference, prompt, ru, right, wrong, yes, no, other, otherNote] = line.split('|');
