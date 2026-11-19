@@ -155,3 +155,21 @@ dialog h2 { margin: 0; }
   font-size: .65em;
   white-space: nowrap;
 }
+button.exercise-choice {
+  width: 100%;
+  text-align: left;
+  color: inherit;
+}
+button.exercise-choice:hover { border-color: var(--focus); }
+.exercise-image { display: block; width: min(100%, 29rem); height: auto; margin: 1rem 0; }
+.gap-form { margin-block: 1rem; }
+.gap-row { display: grid; grid-template-columns: minmax(7rem, auto) minmax(8rem, 1fr) minmax(10rem, 2fr); align-items: center; gap: .6rem; margin: .55rem 0; }
+.gap-row input, .gap-row select {
+  min-width: 0; width: 100%; padding: .45rem .6rem; border: 1px solid var(--line);
+  border-radius: .5rem; color: inherit; background: var(--surface); font: inherit;
+}
+.full-translation p { white-space: pre-line; }
+@media (max-width: 34rem) {
+  .gap-row { grid-template-columns: auto 1fr; }
+  .gap-row input, .gap-row select { grid-column: 1 / -1; }
+}
