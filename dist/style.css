@@ -173,3 +173,43 @@ button.exercise-choice:hover { border-color: var(--focus); }
   .gap-row { grid-template-columns: auto 1fr; }
   .gap-row input, .gap-row select { grid-column: 1 / -1; }
 }
+.celebration {
+  width: min(92vw, 30rem);
+  border: 2px solid #e7a5c4;
+  color: #793451;
+  background: #fff4f9;
+  text-align: center;
+  padding: 1.15rem;
+}
+.celebration h2 { margin: .1rem 2.25rem .85rem; }
+.celebration-close {
+  position: absolute;
+  top: .55rem;
+  right: .55rem;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  border: 1px solid #e7a5c4;
+  border-radius: 50%;
+  color: #793451;
+  background: #fff;
+  font-size: 1.4rem;
+}
+.celebration-frame {
+  border: 1px solid #e7a5c4;
+  border-radius: .8rem;
+  padding: .35rem;
+}
+.frame-hearts, .side-hearts { color: #a84976; font-weight: 750; }
+.frame-hearts { display: block; letter-spacing: .12em; }
+.celebration-picture { display: grid; grid-template-columns: 1rem minmax(0, 1fr) 1rem; align-items: stretch; gap: .3rem; }
+.side-hearts { display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl; letter-spacing: .1em; }
+.celebration-art {
+  display: grid;
+  place-items: center;
+  min-height: 5rem;
+  color: #a84976;
+  background: #f9dce9;
+  border-radius: .55rem;
+  font-size: 3.5rem;
+}
+.celebration-art img { width: 100%; max-height: 63vh; object-fit: contain; border-radius: inherit; }

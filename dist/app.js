@@ -270,6 +270,7 @@ function renderQuestion(focus = false) {
         const solution = options.find(option => option[3]);
         if (exercise.image) feedback.append(translation('Перевод подходящего описания', solution[1]));
         else feedback.append(english(prompt.replace('___', solution[0])), translation('Перевод ответа целиком', ru));
+        if (correct && task.celebration) $('celebration').showModal();
       });
       row.append(input, label, english(option, 'span'));
       if (meaning) row.append(translation('Перевод варианта', meaning));
