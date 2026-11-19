@@ -11,6 +11,24 @@ try {
   // The current session can still track attempts without storage.
 }
 
+const theme = $('theme');
+const themeKey = 'tense-trainer-theme';
+try {
+  const savedTheme = localStorage.getItem(themeKey);
+  if ([...theme.options].some(option => option.value === savedTheme)) theme.value = savedTheme;
+} catch {
+  // Theme selection also works without persistent storage.
+}
+document.documentElement.dataset.theme = theme.value;
+theme.addEventListener('change', () => {
+  document.documentElement.dataset.theme = theme.value;
+  try {
+    localStorage.setItem(themeKey, theme.value);
+  } catch {
+    // Keep the selected theme on the current page.
+  }
+});
+
 function element(tag, className, value) {
   const node = document.createElement(tag);
   if (className) node.className = className;
