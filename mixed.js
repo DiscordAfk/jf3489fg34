@@ -37,6 +37,7 @@ fullPractice.mixed = [
 1j|Diana tells her friend not to call at seven tomorrow. At that time, she ___ along the Neva with Seryozha.|Диана просит подругу не звонить завтра в семь. В это время она будет гулять с Серёжей вдоль Невы.|will be walking|was walking|Прогулка будет в процессе в указанный будущий момент.|Was walking описывает процесс в прошлом.
 1k|By the time Diana gets to the café tomorrow, Seryozha ___ a table for two.|К тому времени, как Диана завтра придёт в кафе, Серёжа уже забронирует столик на двоих.|will have booked|had booked|Бронирование завершится к моменту прихода Дианы завтра.|Had booked требует точки отсчёта в прошлом.
 1l|Next June, Diana and Seryozha ___ together for two years, and they will still have another year at SUAI.|В следующем июне исполнится два года, как Диана и Серёжа учатся вместе, и впереди у них будет ещё год в ГУАПе.|will have been studying|have been studying|Речь о длительности процесса к конкретной точке в будущем.|Have been studying означало бы, что два года прошли уже сейчас.
+1m|If Seryozha ___ for a walk with Diana, he will get a McCombo.|Если Серёжа погуляет с Дианой, он получит Мак Комбо.|goes|will go|В обычном условии о будущем после if ставят Present Simple. Will get сообщает о результате в главной части.|Will go здесь лишнее: придаточное с if уже задаёт условие о будущем.
 `)},
   {title: 'Подставить форму глагола', items: gapRows(`
 2a|They usually [sit;sit;Usually указывает на привычку.] together, but today Diana [sit;is sitting;Today противопоставлено обычному порядку: речь о временной ситуации.] by the window so she can wave to Seryozha when he arrives.|Обычно они сидят вместе, но сегодня Диана сидит у окна, чтобы помахать Серёже, когда он придёт.
@@ -56,7 +57,10 @@ fullPractice.mixed = [
 `)},
 ];
 
+fullPractice.mixed[0].items.find(item => item.reference === '1m').celebration = true;
+
 Object.assign(wordTranslations, {
+  mccombo:'Мак Комбо',
   agreed:'договорились', along:'вдоль', another:'ещё один', arrived:'прибыл, пришёл',
   book:'книга; бронировать', booked:'забронировал', bookmark:'закладка', bridge:'мост',
   café:'кафе', called:'позвонила, окликнул', cannot:'не может', change:'изменить',
