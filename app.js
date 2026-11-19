@@ -48,7 +48,7 @@ function english(value, tag = 'p') {
     button.addEventListener('click', () => {
       $('word-title').textContent = word;
       $('word-title').lang = 'en';
-      $('word-text').textContent = wordTranslations[word.toLowerCase().replaceAll("'", '’')];
+      $('word-text').textContent = wordTranslations[word.toLowerCase().replaceAll("'", '’')] ?? 'Это слово отсутствует в словаре урока.';
       dialog.showModal();
     });
     node.append(button);
@@ -115,69 +115,53 @@ function renderTheory(selected) {
   }
 }
 
-function practiceQueue(selected) {
-  const queue = [];
-  const length = Math.max(...selected.map(topic => exercises[topic.id].length));
-  for (let index = 0; index < length; index++) {
-    for (const topic of selected) {
-      const task = exercises[topic.id][index];
-      if (task) queue.push({topic, task, id: `${topic.id}:${task[2]}`});
-    }
-  }
-  return queue;
-}
-
 function renderPicker(selected) {
   const picker = $('exercise-picker');
-  const queue = practiceQueue(selected);
-  const choices = new Map();
-  const start = element('button', 'primary', 'Начать выбранные');
-  const status = element('span');
-  status.setAttribute('role', 'status');
-
-  function updateCount() {
-    const count = [...choices.values()].filter(input => input.checked).length;
-    start.disabled = count === 0;
-    status.textContent = `Выбрано ${count} из ${queue.length}`;
-  }
-
-  picker.replaceChildren(element('p', 'hint', 'Отметь предложения, которые хочешь потренировать.'));
+  picker.replaceChildren(element('p', 'hint', 'Выбери упражнение по номеру из PDF, чтобы пройти все его пункты по порядку.'));
   for (const topic of selected) {
     const group = element('fieldset', 'exercise-group');
     group.append(element('legend', '', topic.title));
-    for (const {task, id} of queue.filter(item => item.topic === topic)) {
-      const label = element('label', 'exercise-choice');
-      const input = element('input');
-      input.type = 'checkbox';
-      input.checked = !attempted.has(id);
-      input.addEventListener('change', updateCount);
-      choices.set(id, input);
+    fullPractice[topic.id].forEach((exercise, index) => {
+      const number = index + 1;
+      const queue = exercise.items.map(task => ({
+        topic, task, exercise, number, id: `${topic.id}:${task.reference}`,
+      }));
+      const completed = queue.filter(item => attempted.has(item.id)).length;
+      const button = element('button', 'exercise-choice');
+      button.type = 'button';
       const copy = element('span');
-      const sentence = element('span', '', task[0]);
-      sentence.lang = 'en';
-      copy.append(sentence);
-      if (attempted.has(id)) copy.append(element('small', '', 'Уже было'));
-      label.append(input, copy);
-      group.append(label);
-    }
+      copy.append(element('strong', '', `Упражнение ${number}. ${exercise.title}`));
+      const total = exercise.passage ? exercise.items.reduce((count, task) => count + task.gaps.length, 0) : queue.length;
+      copy.append(element('small', '', exercise.passage
+        ? `Пропусков: ${total}${completed ? ` · Частей пройдено: ${completed} из ${queue.length}` : ''}`
+        : `Пунктов: ${total}${completed ? ` · Пройдено: ${completed} из ${queue.length}` : ''}`));
+      button.append(copy);
+      button.addEventListener('click', () => startPractice(selected, queue));
+      group.append(button);
+    });
     picker.append(group);
   }
+}
 
-  const actions = element('div', 'actions');
-  const all = element('button', 'secondary', 'Выбрать все');
-  const fresh = element('button', 'secondary', 'Только новые');
-  const clear = element('button', 'secondary', 'Снять выбор');
-  function setChoices(shouldCheck) {
-    for (const [id, input] of choices) input.checked = shouldCheck(id);
-    updateCount();
-  }
-  all.addEventListener('click', () => setChoices(() => true));
-  fresh.addEventListener('click', () => setChoices(id => !attempted.has(id)));
-  clear.addEventListener('click', () => setChoices(() => false));
-  start.addEventListener('click', () => startPractice(selected, queue.filter(item => choices.get(item.id).checked)));
-  actions.append(start, all, fresh, clear, status);
-  picker.append(actions);
-  updateCount();
+function exerciseText(prompt, substitute) {
+  const parts = prompt.split(/\[[^\]]+\]/g);
+  return parts.map((part, index) => index ? substitute(index - 1) + part : part).join('');
+}
+
+function normalizeAnswer(value) {
+  return value.toLowerCase().normalize('NFKC')
+    .replace(/[’‘]/g, "'")
+    .replace(/\bwon't\b/g, 'will not')
+    .replace(/n't\b/g, ' not')
+    .replace(/'ll\b/g, ' will')
+    .replace(/'m\b/g, ' am')
+    .replace(/'re\b/g, ' are')
+    .replace(/'ve\b/g, ' have')
+    .replace(/'s(?= been\b)/g, ' has')
+    .replace(/'s\b/g, ' is')
+    .replace(/[.,!?;:]/g, '')
+    .replace(/[–—-]/g, ' ')
+    .trim().replace(/\s+/g, ' ');
 }
 
 function startPractice(selected, queue) {
@@ -191,7 +175,7 @@ function showPicker(selected, focus = false) {
   $('practice').hidden = true;
   $('exercise-picker').hidden = false;
   renderPicker(selected);
-  if (focus) $('exercise-picker').querySelector('input').focus();
+  if (focus) $('exercise-picker').querySelector('button').focus();
 }
 
 function renderQuestion(focus = false) {
@@ -210,59 +194,140 @@ function renderQuestion(focus = false) {
     return;
   }
 
-  const {id, topic, task: [prompt, ru, reference, options]} = current;
-  const counter = element('p', 'eyebrow', `Задание ${session.index + 1} из ${session.queue.length}`);
+  const {id, topic, task, exercise, number} = current;
+  const {prompt, ru, reference, options, gaps} = task;
+  const counter = element('p', 'eyebrow', `Упражнение ${number} · ${exercise.passage ? 'Часть' : 'Пункт'} ${session.index + 1} из ${session.queue.length}`);
   counter.tabIndex = -1;
-  card.append(counter, element('h3', '', 'Выбери наиболее подходящий вариант.'), english(prompt),
-    translation('Перевод предложения целиком', ru));
+  card.append(counter, element('h3', '', exercise.title));
+  if (exercise.image) {
+    const image = element('img', 'exercise-image');
+    image.src = exercise.image;
+    image.alt = 'Четыре пронумерованных рисунка с Питером из упражнения в PDF';
+    card.append(image);
+  }
+  if (exercise.passage) {
+    const context = element('details', 'full-translation');
+    context.append(element('summary', '', 'Весь текст с пропусками'));
+    let gapNumber = 0;
+    for (const part of exercise.items) {
+      context.append(english(exerciseText(part.prompt, () => ` [${++gapNumber}] ___ `)));
+    }
+    context.append(translation('Перевод всего текста', exercise.items.map(item => item.ru).join('\n\n')));
+    card.append(context);
+  }
+  const gapOffset = exercise.passage ? exercise.items.slice(0, session.index).reduce((total, part) => total + part.gaps.length, 0) : 0;
+  card.append(english(gaps ? exerciseText(prompt, index => `[${gapOffset + index + 1}] ___`) : prompt),
+    translation(exercise.passage ? 'Перевод отрывка' : 'Перевод задания целиком', ru));
 
-  const fieldset = element('fieldset');
-  fieldset.append(element('legend', '', 'Варианты ответа'));
   const feedback = element('div');
   feedback.setAttribute('aria-live', 'polite');
   const footer = element('div', 'question-footer');
-  const next = element('button', 'primary', session.index + 1 === session.queue.length ? 'Показать результат' : 'Следующее задание');
+  const next = element('button', 'primary', session.index + 1 === session.queue.length ? 'Показать результат' : 'Следующий пункт');
   next.disabled = true;
   next.addEventListener('click', () => {
     session.index++;
     renderQuestion(true);
   });
 
-  options.forEach(([option, meaning, , correct], index) => {
-    const row = element('div', 'option');
-    const input = element('input');
-    input.type = 'radio';
-    input.name = 'answer';
-    input.id = `answer-${index}`;
-    const label = element('label', '', `Вариант ${index + 1}`);
-    label.htmlFor = input.id;
-    input.addEventListener('change', () => {
-      if (!input.checked || !next.disabled) return;
-      for (const radio of fieldset.querySelectorAll('input')) radio.disabled = true;
-      session.correct += Number(Boolean(correct));
-      attempted.add(id);
-      try {
-        localStorage.setItem(historyKey, JSON.stringify([...attempted]));
-      } catch {
-        // Keep attempts in memory for this visit.
-      }
-      feedback.append(element('p', '', correct ? 'Верно.' : 'Есть более подходящий вариант.'));
-      for (const [text, , explanation, isCorrect] of options) {
-        const result = element('div', `answer ${isCorrect ? 'correct' : 'incorrect'}`);
-        result.append(english(text), element('p', '', explanation));
-        feedback.append(result);
-      }
-      const solution = options.find(option => option[3])[0];
-      feedback.append(english(prompt.replace('___', solution)), translation('Перевод ответа целиком', ru));
-      footer.prepend(element('p', 'source', `${topic.source} · Practice ${reference}`));
-      next.disabled = false;
+  function complete(correct) {
+    session.correct += Number(correct);
+    attempted.add(id);
+    try {
+      localStorage.setItem(historyKey, JSON.stringify([...attempted]));
+    } catch {
+      // Keep attempts in memory for this visit.
+    }
+    feedback.append(element('p', '', correct ? 'Верно.' : 'Посмотри разбор ответа.'));
+    footer.prepend(element('p', 'source', `${topic.source} · Practice ${reference}`));
+    next.disabled = false;
+  }
+
+  function explain(text, explanation, correct) {
+    const result = element('div', `answer ${correct ? 'correct' : 'incorrect'}`);
+    result.append(english(text), element('p', '', explanation));
+    feedback.append(result);
+  }
+
+  if (options) {
+    const fieldset = element('fieldset');
+    fieldset.append(element('legend', '', 'Варианты ответа'));
+    options.forEach(([option, meaning, , correct], index) => {
+      const row = element('div', 'option');
+      const input = element('input');
+      input.type = 'radio';
+      input.name = 'answer';
+      input.id = `answer-${index}`;
+      const label = element('label', '', `Вариант ${index + 1}`);
+      label.htmlFor = input.id;
+      input.addEventListener('change', () => {
+        for (const radio of fieldset.querySelectorAll('input')) radio.disabled = true;
+        complete(Boolean(correct));
+        for (const [text, , explanation, isCorrect] of options) {
+          explain(text, exercise.image && !isCorrect
+            ? `Это описание относится к другой ситуации. ${explanation}`
+            : explanation, Boolean(isCorrect));
+        }
+        const solution = options.find(option => option[3]);
+        if (exercise.image) feedback.append(translation('Перевод подходящего описания', solution[1]));
+        else feedback.append(english(prompt.replace('___', solution[0])), translation('Перевод ответа целиком', ru));
+      });
+      row.append(input, label, english(option, 'span'));
+      if (meaning) row.append(translation('Перевод варианта', meaning));
+      fieldset.append(row);
     });
-    row.append(input, label, english(option, 'span'), translation('Перевод варианта', meaning));
-    fieldset.append(row);
-  });
+    card.append(fieldset);
+  } else {
+    const form = element('form', 'gap-form');
+    const fields = gaps.map((gap, index) => {
+      const row = element('div', 'gap-row');
+      const input = element(gap.variants ? 'select' : 'input');
+      input.required = true;
+      input.id = `gap-${index}`;
+      const label = element('label', '', `Пропуск ${gapOffset + index + 1}`);
+      label.htmlFor = input.id;
+      if (gap.variants) {
+        input.append(element('option', '', 'Выбери форму'));
+        input.options[0].value = '';
+        for (const variant of gap.variants) input.append(element('option', '', variant));
+      } else {
+        input.type = 'text';
+        input.lang = 'en';
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+        input.addEventListener('input', () => input.setCustomValidity(''));
+      }
+      row.append(label, english(gap.cue, 'span'), input);
+      form.append(row);
+      return input;
+    });
+    const check = element('button', 'primary', 'Проверить');
+    check.type = 'submit';
+    form.append(check);
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if (check.disabled) return;
+      const empty = fields.find(input => !input.value.trim());
+      if (empty) {
+        empty.setCustomValidity('Заполни этот пропуск.');
+        empty.reportValidity();
+        return;
+      }
+      const results = gaps.map((gap, index) =>
+        gap.answers.some(answer => normalizeAnswer(answer) === normalizeAnswer(fields[index].value)));
+      fields.forEach(input => { input.disabled = true; });
+      check.disabled = true;
+      complete(results.every(Boolean));
+      gaps.forEach((gap, index) => {
+        if (!results[index]) explain(fields[index].value, `Пропуск ${gapOffset + index + 1}. ${gap.rejected || 'Для этого контекста сравни свою форму с образцом ниже.'}`, false);
+        explain(gap.answers.join(' / '), `Пропуск ${gapOffset + index + 1}. ${gap.explanation}`, true);
+      });
+      feedback.append(english(exerciseText(prompt, index => gaps[index].answers[0])), translation('Перевод ответа целиком', ru));
+    });
+    card.append(form);
+  }
 
   footer.append(next, exercisePickerButton());
-  card.append(fieldset, feedback, footer);
+  card.append(feedback, footer);
   if (focus) counter.focus();
 }
 
