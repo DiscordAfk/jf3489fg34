@@ -1,0 +1,68 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, system-ui, sans-serif;
+  color: #1e2435;
+  background: #f4f5fa;
+  line-height: 1.55;
+  --purple: #5145ad;
+  --line: #d7dbea;
+  --muted: #50596f;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .55; cursor: default; }
+:focus-visible { outline: 3px solid #6d5cc8; outline-offset: 4px; }
+.frame { width: min(100% - 2.5rem, 58rem); margin-inline: auto; }
+.top { border-bottom: 1px solid var(--line); background: white; }
+.top .frame { display: flex; align-items: center; gap: .7rem; min-height: 4rem; font-weight: 750; }
+.brand-mark { border-radius: .55rem; background: #ece9fb; color: var(--purple); padding: .25rem .5rem; }
+main { padding-block: clamp(2rem,7vw,5rem); }
+.intro { max-width: 45rem; margin-bottom: 2.4rem; }
+h1 { font-size: clamp(2rem, 6vw, 3.5rem); line-height: 1.09; letter-spacing: -.04em; margin: 0 0 1rem; }
+h2 { font-size: 1.65rem; margin-block: 2rem 1rem; }
+h3 { font-size: 1.18rem; margin: 0; }
+p { margin: .45rem 0 1rem; }
+.intro p, .hint, #selected { color: var(--muted); }
+fieldset { border: 0; padding: 0; margin: 0; min-inline-size: 0; }
+legend { padding: 0; font-weight: 750; margin-bottom: .6rem; }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; }
+.tile { display: flex; align-items: flex-start; gap: .75rem; padding: 1.2rem; background: #fff; border: 1px solid var(--line); border-radius: .95rem; cursor: pointer; }
+.tile:has(:checked) { border-color: var(--topic); box-shadow: inset 0 0 0 1px var(--topic); }
+.tile strong { display: block; color: var(--topic); font-size: 1.2rem; }
+.tile small { font-size: .9rem; color: var(--muted); }
+.tile input { accent-color: var(--topic); width: 1.15rem; height: 1.15rem; flex: none; }
+.actions, .jump, .question-footer { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem; margin-top: 1.25rem; }
+.primary, .secondary { border-radius: .6rem; padding: .62rem .9rem; font-weight: 700; }
+.primary { color: white; background: var(--purple); border: 1px solid var(--purple); }
+.secondary { color: var(--purple); background: white; border: 1px solid var(--line); }
+#lesson-title { margin-top: 1rem; }
+.jump a { color: var(--purple); font-weight: 700; }
+.hint { margin-top: .9rem; }
+.topic-panel, .question { background: #fff; border: 1px solid var(--line); border-radius: .95rem; padding: clamp(1rem, 3vw, 1.6rem); margin-bottom: 1rem; }
+.topic-panel { border-left: 4px solid var(--topic); }
+.topic-panel > h3 { color: var(--topic); }
+.rule { margin-top: 1.05rem; padding-top: .85rem; border-top: 1px solid var(--line); }
+.rule summary { cursor: pointer; font-weight: 740; }
+.formula { display: inline-block; margin-top: .65rem; padding: .15rem .55rem; border-radius: .35rem; color: #392e8e; background: #f0edfc; overflow-wrap: anywhere; }
+.phrase { line-height: 1.85; font-size: 1.1rem; }
+.word { display: inline; padding: 0; background: transparent; border: 0; color: inherit; font: inherit; text-decoration: underline dotted #7363b4; text-underline-offset: .23em; }
+.word:hover { color: var(--purple); background: #f0edfc; }
+.full-translation { margin: .5rem 0; }
+.full-translation summary { width: fit-content; cursor: pointer; color: var(--purple); font-weight: 650; }
+.full-translation p { margin: .35rem 0; }
+.source, .eyebrow { color: var(--muted); font-size: .875rem; }
+.source { margin: 1rem 0 0; overflow-wrap: anywhere; }
+.option { padding: .65rem .8rem; margin: .6rem 0; background: #f8f8fc; border: 1px solid var(--line); border-radius: .6rem; }
+.option label { margin-right: .6rem; }
+.option input { accent-color: var(--purple); }
+.answer { padding: .75rem; border-radius: .55rem; background: #f4f5fa; }
+.answer.correct { background: #e9f7ef; }
+.answer.incorrect { background: #fbefe8; }
+.answer p { margin: .35rem 0; }
+dialog { max-width: min(90vw, 30rem); border: 1px solid var(--line); border-radius: .9rem; padding: 1.4rem; color: inherit; }
+dialog::backdrop { background: #1c1c3480; }
+dialog h2 { margin: 0; }
+@media (max-width: 34rem) { .tiles { grid-template-columns: 1fr; } }

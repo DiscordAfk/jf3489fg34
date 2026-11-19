@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Практика английских времён с пословным переводом и разбором каждого ответа.">
+  <title>Времена английского — тренажёр</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="lessons.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header class="top"><div class="frame"><span class="brand-mark" aria-hidden="true">Aa</span> Времена английского</div></header>
+  <main class="frame">
+    <section id="home">
+      <div class="intro">
+        <h1>Тренажёр английских времён</h1>
+        <p>Выбери один или несколько разделов. В каждом уроке сначала идёт теория, затем задания с разбором.</p>
+      </div>
+      <fieldset>
+        <legend>Разделы</legend>
+        <div id="topics" class="tiles"></div>
+      </fieldset>
+      <div class="actions">
+        <button id="start" class="primary" disabled>Открыть урок</button>
+        <button id="select-all" class="secondary" type="button">Выбрать все</button>
+        <span id="selected" role="status"></span>
+      </div>
+    </section>
+    <section id="lesson" hidden aria-labelledby="lesson-title">
+      <button id="back" class="secondary" type="button">К выбору разделов</button>
+      <h1 id="lesson-title" tabindex="-1">Урок</h1>
+      <nav class="jump" aria-label="Разделы урока"><a href="#theory-heading">Теория</a><a href="#practice-heading">Практика</a></nav>
+      <p class="hint">Нажми на слово для перевода или открой перевод всей фразы.</p>
+      <h2 id="theory-heading">Теория</h2>
+      <div id="theory"></div>
+      <h2 id="practice-heading">Практика</h2>
+      <div id="practice"></div>
+    </section>
+  </main>
+  <dialog id="translation" aria-labelledby="word-title">
+    <form method="dialog">
+      <p class="eyebrow">Перевод слова</p>
+      <h2 id="word-title"></h2>
+      <p id="word-text"></p>
+      <button class="primary">Закрыть</button>
+    </form>
+  </dialog>
+</body>
+</html>
